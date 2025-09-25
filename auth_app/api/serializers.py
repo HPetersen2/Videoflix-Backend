@@ -38,3 +38,31 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.set_password(pw)
         account.save()
         return account
+    
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the serializer and remove the username field."""
+        super().__init__(*args, **kwargs)
+
+        if 'username' in self.fields:
+            self.fields.pop('username')
+
+    def validate(self, attrs):
+        """Validate email and password, and return authentication tokens."""
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid email or password")
+        
+        if not user.check_password(password):
+            raise serializers.ValidationError("Invalid email or password")
+        
+        attrs["username"] = user.username
+        data = super().validate(attrs)
+        return data

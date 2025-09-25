@@ -78,3 +78,43 @@ class ActivationView(APIView):
             return Response({"detail": "Account activated"}, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        """Obtain JWT tokens and set them as cookies."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.user
+        tokens = serializer.validated_data
+
+        access = tokens.get("access")
+        refresh = tokens.get("refresh")
+
+        response = Response({
+            "detail": "Login successful",
+            "user": {
+                "id": user.id,
+                "username": user.username
+            }
+        })
+
+        if access and refresh:
+            response.set_cookie(
+                key="access_token",
+                value=str(access),
+                httponly=True,
+                secure=True,
+                samesite="Lax"
+            )
+
+            response.set_cookie(
+                key="refresh_token",
+                value=str(refresh),
+                httponly=True,
+                secure=True,
+                samesite="Lax"
+            )
+
+        return response
