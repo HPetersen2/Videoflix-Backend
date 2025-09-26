@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import environ
 from datetime import timedelta
 
 load_dotenv()
@@ -163,14 +164,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+env = environ.Env(
+    EMAIL_USE_TLS=(bool, True),
+    EMAIL_USE_SSL=(bool, False),
+)
+
+environ.Env.read_env()
+
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
+)
 EMAIL_HOST=os.getenv('EMAIL_HOST')
-EMAIL_PORT=os.getenv('EMAIL_PORT', default=587)
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS=os.getenv('EMAIL_USE_TLS', default=True)
-EMAIL_USE_SSL=os.getenv('EMAIL_USE_SSL', default=False)
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_USE_SSL = env('EMAIL_USE_SSL')
 DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL')
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
