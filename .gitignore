@@ -1,4 +1,6 @@
 .env
+staticfiles
+static
 
 ### OSX ###
 .DS_Store

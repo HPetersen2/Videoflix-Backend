@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,20 +12,20 @@
         <table align="center" width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin: 40px auto; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
           <tr>
             <td align="center" style="padding: 20px 0;">
-              <img src="{{ './static/logo_videoflix.svg' }}" alt="Videoflix Logo" style="max-width: 200px;">
+              <img src="{% static 'images/logo_videoflix.svg' %}" alt="Videoflix Logo" style="max-width: 200px;">
             </td>
           </tr>
           <tr>
             <td style="padding: 20px; color: #333;">
-              <p style="font-size: 16px;">Dear {{ context.user }},</p>
+              <p style="font-size: 16px;">Dear {{ user }},</p>
               <p style="font-size: 16px;">
-                Thank you for registering with <strong>Videoflix</strong>.
+                Thank you for registering with <strong><span style="color: #2f3dde;">Videoflix</span></strong>.
                 To complete your registration and verify your email address,
                 please click the button below:
               </p>
               <p style="text-align: center; margin: 30px 0;">
-              <a href="{{ verification_link }}"
-                style="background-color: #1f2edb;
+              <a href="{{ activation_link }}"
+                style="background-color: #2f3dde;
                         color: #ffffff;
                         display: inline-block;
                         padding: 14px 30px;

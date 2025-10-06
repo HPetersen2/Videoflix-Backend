@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.core.mail import send_mail
-from .serializers import RegistrationSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -12,6 +11,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from .serializers import RegistrationSerializer
 
 User = get_user_model()
 
@@ -41,9 +41,10 @@ class RegistrationView(APIView):
                 'activation_link': activation_link,
             }
             text_content = render_to_string(
-                'activation_email.txt', context)
+                'emails/activation_email.txt', context)
             html_content = render_to_string(
-                'activation_email.html', context)
+                'emails/activation_email.html', context)
+            print(context)
 
             email = EmailMultiAlternatives(
                 subject, text_content, from_email, ['petermann2@web.de']) #saved_account.email
@@ -70,14 +71,14 @@ class ActivationView(APIView):
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except Exception:
-            return Response({"detail": "Invalid activation link"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid activation link."}, status=status.HTTP_400_BAD_REQUEST)
 
         if default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-            return Response({"detail": "Account activated"}, status=status.HTTP_200_OK)
+            return Response({"message": "Account successfully activated."}, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(TokenObtainPairView):
