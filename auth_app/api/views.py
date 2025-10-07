@@ -3,15 +3,17 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from .serializers import RegistrationSerializer
+import django_rq
+from .utils import send_email
+from .serializers import RegistrationSerializer, CustomTokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -29,27 +31,11 @@ class RegistrationView(APIView):
             token = default_token_generator.make_token(saved_account)
 
 
-            activation_path = reverse('auth_app:activate', kwargs={
-                                      'uidb64': uid, 'token': token})
-            activation_link = request.build_absolute_uri(activation_path)
+            activation_path = reverse('auth_app:activate', kwargs={'uidb64': uid, 'token': token})
 
-            # render email (text fallback + html)
-            subject = 'Activate your account'
-            from_email = None  # uses DEFAULT_FROM_EMAIL
-            context = {
-                'user': saved_account,
-                'activation_link': activation_link,
-            }
-            text_content = render_to_string(
-                'emails/activation_email.txt', context)
-            html_content = render_to_string(
-                'emails/activation_email.html', context)
-            print(context)
+            activation_link = f'http://127.0.0.1:5500/pages/auth/activate.html?uid={uid}&token={token}'
 
-            email = EmailMultiAlternatives(
-                subject, text_content, from_email, ['petermann2@web.de']) #saved_account.email
-            email.attach_alternative(html_content, "text/html")
-            email.send(fail_silently=False)
+            django_rq.get_queue('default').enqueue('auth_app.api.utils.send_email', saved_account, activation_link)
 
             data = {
                 "user": {
@@ -82,6 +68,8 @@ class ActivationView(APIView):
 
 
 class LoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
     def post(self, request, *args, **kwargs):
         """Obtain JWT tokens and set them as cookies."""
         serializer = self.get_serializer(data=request.data)
@@ -117,5 +105,61 @@ class LoginView(TokenObtainPairView):
                 secure=True,
                 samesite="Lax"
             )
+
+        return response
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """Blacklist the refresh token and log the user out."""
+        refresh_token = request.COOKIES.get('refresh_token')
+        if refresh_token is None:
+            response = Response({"detail": "No refresh token cookie provided."}, status=status.HTTP_200_OK)
+        else:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except TokenError as e:
+                return Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
+
+            response = Response({"detail": "Logout successful! All tokens will be deleted. Refresh token is now invalid."}, status=status.HTTP_200_OK)
+
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+
+        return response
+    
+class TokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        """Refresh the access token using the refresh token stored in cookies."""
+        refresh_token = request.COOKIES.get("refresh_token")
+
+        if refresh_token is None:
+            return Response(
+                {"detail": "Refresh token not found!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        serializer = self.get_serializer(data={"refresh":refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except:
+            return Response(
+                {"detail": "Refresh token invalid!"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        
+        access_token = serializer.validated_data.get("access")
+
+        response = Response({"detail": "Token refreshed", "access": "new_access_token"})
+        response.set_cookie(
+            key="access_token",
+            value=str(access_token),
+            httponly=True,
+            secure=False,
+            samesite="Lax"
+        )
 
         return response
