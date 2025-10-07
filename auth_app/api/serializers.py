@@ -66,3 +66,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         attrs["username"] = user.username
         data = super().validate(attrs)
         return data
+    
+class PasswordResetSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['email']
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            return value
+        return None

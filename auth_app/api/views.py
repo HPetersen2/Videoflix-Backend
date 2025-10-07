@@ -12,8 +12,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import django_rq
-from .utils import send_email
-from .serializers import RegistrationSerializer, CustomTokenObtainPairSerializer
+from .utils import send_activate_email, send_reset_password_email
+from .serializers import RegistrationSerializer, CustomTokenObtainPairSerializer, PasswordResetSerializer
 
 User = get_user_model()
 
@@ -35,7 +35,7 @@ class RegistrationView(APIView):
 
             activation_link = f'http://127.0.0.1:5500/pages/auth/activate.html?uid={uid}&token={token}'
 
-            django_rq.get_queue('default').enqueue('auth_app.api.utils.send_email', saved_account, activation_link)
+            django_rq.get_queue('default').enqueue('auth_app.api.utils.send_activate_email', saved_account, activation_link)
 
             data = {
                 "user": {
@@ -163,3 +163,25 @@ class TokenRefreshView(TokenRefreshView):
         )
 
         return response
+    
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetSerializer
+
+        data = {}
+        if serializer.is_valid():
+            saved_account = serializer.save()
+
+            uid = urlsafe_base64_encode(force_bytes(saved_account.pk))
+            token = default_token_generator.make_token(saved_account)
+
+            activation_path = reverse('auth_app:forgot_password', kwargs={'uidb64': uid, 'token': token})
+
+            activation_link = f'http://127.0.0.1:5500/pages/auth/forgot_password.html?uid={uid}&token={token}'
+
+            django_rq.get_queue('default').enqueue('auth_app.api.utils.send_reset_password_email', saved_account, activation_link)
+
+
+            return Response({"detail": "An email has been sent to reset your password."}, status=status.HTTP_200_OK)
