@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegistrationView, ActivationView, LoginView, LogoutView, TokenRefreshView, PasswordResetView
+from .views import RegistrationView, ActivationView, LoginView, LogoutView, TokenRefreshView, PasswordResetView, SetNewPasswordView
 
 app_name = 'auth_app'
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('password_reset/', PasswordResetView.as_view(), name='password-reset'),
+    path('password_confirm/<uidb64>/<token>/', SetNewPasswordView.as_view(), name='set-new-password'),
 ]
