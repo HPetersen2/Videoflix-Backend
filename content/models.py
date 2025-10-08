@@ -1,4 +1,17 @@
 from django.db import models
 
+CATEGORY_CHOICES = {
+    ("drama", "Drama"),
+    ("romance", "Romance"),
+}
+
 class Video(models.Model):
-    pass
+    created_at = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=155)
+    description = models.CharField(max_length=255)
+    thumbnail_url = models.URLField()
+    category = models.CharField(max_length=55, choices=CATEGORY_CHOICES, null=True, blank=True)
+    video_file = models.FileField(upload_to='media/videos/')
+
+    def __str__(self):
+        return f"{self.title} | Category: {self.category or 'Uncategorized'} | Uploaded: {self.created_at:%Y-%m-%d %H:%M}"
