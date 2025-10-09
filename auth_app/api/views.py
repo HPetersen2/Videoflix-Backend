@@ -177,17 +177,21 @@ class PasswordResetView(APIView):
 
         try:
             user = User.objects.get(email=email)
+            if user.is_active:
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+
+                activation_link = f'http://127.0.0.1:5500/pages/auth/confirm_password.html?uid={uid}&token={token}'
+
+                django_rq.get_queue('default').enqueue(
+                    'auth_app.api.utils.send_reset_password_email',
+                    user.id,
+                    activation_link
+                )
         except User.DoesNotExist:
-            return Response({"detail": "Email not found."}, status=status.HTTP_400_BAD_REQUEST)
-
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-
-        activation_link = f'http://127.0.0.1:5500/pages/auth/confirm_password.html?uid={uid}&token={token}'
-
-        django_rq.get_queue('default').enqueue('auth_app.api.utils.send_reset_password_email', user.id, activation_link)
-
-        return Response({"detail": "An email has been sent to reset your password."}, status=status.HTTP_200_OK)
+            pass
+        
+        return Response({"detail": "If an account with this email exists, a password reset link has been sent."}, status=status.HTTP_200_OK)
     
 class SetNewPasswordView(APIView):
     permission_classes = [AllowAny]
