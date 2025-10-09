@@ -181,12 +181,12 @@ class PasswordResetView(APIView):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
 
-                activation_link = f'http://127.0.0.1:5500/pages/auth/confirm_password.html?uid={uid}&token={token}'
+                verification_link = f'http://127.0.0.1:5500/pages/auth/confirm_password.html?uid={uid}&token={token}'
 
                 django_rq.get_queue('default').enqueue(
                     'auth_app.api.utils.send_reset_password_email',
                     user.id,
-                    activation_link
+                    verification_link
                 )
         except User.DoesNotExist:
             pass
