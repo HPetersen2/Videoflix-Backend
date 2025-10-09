@@ -8,4 +8,4 @@ from .models import Video
 def video_post_save(sender, instance, created, **kwargs):
     print('Video wurde gespeichert')
     if created:
-            print('Video wurde hochgeladen.')
+        pass
