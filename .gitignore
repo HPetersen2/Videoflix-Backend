@@ -1,6 +1,7 @@
 .env
 staticfiles
-static
+/static/*
+!static/assets/
 
 ### OSX ###
 .DS_Store
