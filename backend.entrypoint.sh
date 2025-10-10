@@ -13,6 +13,9 @@ done
 
 echo "PostgreSQL ist bereit - fahre fort..."
 
+export EMAIL_HOST=${EMAIL_HOST:-mailhog}
+export EMAIL_PORT=${EMAIL_PORT:-1025}
+
 # Deine originalen Befehle (ohne wait_for_db)
 python manage.py collectstatic --noinput
 python manage.py makemigrations
