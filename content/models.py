@@ -6,12 +6,11 @@ CATEGORY_CHOICES = {
     ("romance", "Romance"),
 }
 
-
 class Video(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=155)
     description = models.CharField(max_length=255)
-    thumbnail_url = models.URLField()
+    thumbnail = models.ImageField(upload_to=f"thumbnails/")
     category = models.CharField(
         max_length=55, choices=CATEGORY_CHOICES, null=True, blank=True)
     video_file = models.FileField(upload_to=f"videos/")
