@@ -2,6 +2,7 @@
 staticfiles
 /static/*
 !static/assets/
+media
 
 ### OSX ###
 .DS_Store
