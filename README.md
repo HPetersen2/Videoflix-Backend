@@ -12,6 +12,8 @@ Frontend repository: [Videoflix Frontend](https://github.com/HPetersen2/Videofli
 
 ## Features
 
+The Videoflix backend provides the following core features:
+
 - User registration and login  
 - Email-based account activation  
 - Password reset via email with secure token  
