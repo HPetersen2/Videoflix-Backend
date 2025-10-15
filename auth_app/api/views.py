@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import django_rq
-from .utils import send_activate_email, send_reset_password_email
+from auth_app.utils import send_activate_email, send_reset_password_email
 from .serializers import RegistrationSerializer, CustomTokenObtainPairSerializer, PasswordResetSerializer, SetNewPasswordSerializer
 
 User = get_user_model()
