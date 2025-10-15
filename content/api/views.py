@@ -13,7 +13,7 @@ class VideoListView(generics.ListAPIView):
 class VideoView(APIView):
     permission_classes = [IsAuthenticatedWithCookie]
 
-    def get(self, **kwargs):
+    def get(self, request, *args, **kwargs):
         movie_id = kwargs.get("movie_id")
         resolution = kwargs.get("resolution")
 
