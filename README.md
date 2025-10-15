@@ -1,6 +1,6 @@
 # Videoflix Backend
 
-![Logo](/media/logoheader.png)
+![Logo](/static/assets/logo_icon.svg)
 
 **Videoflix** is a video streaming platform inspired by Netflix. Users can register, activate their account via email, reset forgotten passwords, and stream videos in multiple resolutions with custom playback speeds in the integrated player.
 
