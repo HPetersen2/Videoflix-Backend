@@ -14,7 +14,7 @@ def send_activate_email(saved_account, activation_link):
         'emails/activation_email.html', context)
 
     email = EmailMultiAlternatives(
-        subject, text_content, from_email, ['petermann2@web.de']) #saved_account.email
+        subject, text_content, from_email, [saved_account.email])
     email.attach_alternative(html_content, "text/html")
     email.send(fail_silently=False)
 
@@ -31,6 +31,6 @@ def send_reset_password_email(saved_account, verification_link):
         'emails/reset_password_email.html', context)
 
     email = EmailMultiAlternatives(
-        subject, text_content, from_email, ['petermann2@web.de']) #saved_account.email
+        subject, text_content, from_email, [saved_account.email])
     email.attach_alternative(html_content, "text/html")
     email.send(fail_silently=False)
