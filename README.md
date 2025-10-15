@@ -6,11 +6,11 @@
 
 This repository contains the backend of the application, built with **Django**, **Django REST Framework**, **JWT Authentication**, and **ffmpeg** for video encoding.
 
-👉 Frontend repository: [Videoflix Frontend](https://github.com/HPetersen2/Videoflix-Frontend.git)
+Frontend repository: [Videoflix Frontend](https://github.com/HPetersen2/Videoflix-Frontend.git)
 
 ---
 
-## 🚀 Features
+## Features
 
 - User registration and login  
 - Email-based account activation  
@@ -22,14 +22,14 @@ This repository contains the backend of the application, built with **Django**, 
 
 ---
 
-## 🧰 Requirements
+## Requirements
 
 - **Python** 3.13.3 or newer  
 - **Docker** and **Docker Compose**  
   → [Install Docker](https://docs.docker.com/get-docker/)  
 - **ffmpeg** (required for video transcoding)
 
-### 🔧 Installing `ffmpeg`
+### Installing `ffmpeg`
 
 > `ffmpeg` is required inside the container, but may also be useful locally for testing.
 
@@ -53,7 +53,7 @@ sudo apt install ffmpeg
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
 ### 1. Clone the repository
 
@@ -134,9 +134,9 @@ The backend will be available at:
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
-### 🔐 Authentication
+### Authentication
 
 | Method | Endpoint                                         | Description                     |
 |--------|--------------------------------------------------|---------------------------------|
@@ -150,7 +150,7 @@ The backend will be available at:
 
 ---
 
-### 🎬 Video
+### Video
 
 | Method | Endpoint                                                                 | Description                         |
 |--------|--------------------------------------------------------------------------|-------------------------------------|
@@ -160,7 +160,7 @@ The backend will be available at:
 
 ---
 
-## 🛠️ Built With
+## Built With
 
 - **Python 3.13.3**  
 - **Django**  
@@ -176,13 +176,13 @@ The backend will be available at:
 
 ---
 
-## 👨‍💻 Credits
+## Credits
 
 - **Backend**: Developed by Henrik Petersen  
 - **Frontend**: Provided by Developer Akademie
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
