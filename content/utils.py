@@ -6,7 +6,7 @@ from .models import Video
 
 def convert_video(source, resolution):
     file_directory = os.path.dirname(source)
-    file_name = os.path.splitext(os.path.basename(source))
+    file_name = os.path.splitext(os.path.basename(source))[0]
     new_file_name = f"{file_name}_{resolution}p.mp4"
     mp4_dir = os.path.join(file_directory, "mp4")
     os.makedirs(mp4_dir, exist_ok=True)
@@ -43,7 +43,7 @@ def get_video_file(movie_id, **kwargs):
             content_type = "video/MP2T"
 
         if os.path.exists(hls_file_path):
-            return FileResponse(open(hls_file_path, "rb"), content_type=content_type)
+            return FileResponse(open(hls_file_path, 'rb'), content_type=content_type)
         else:
             return Response({"error": "File not found"}, status=404)
         
