@@ -24,5 +24,6 @@ urlpatterns = [
     path('django-rq/', include('django_rq.urls')),
     path('api/', include('core.api_urls')),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
