@@ -22,7 +22,7 @@ class VideoView(APIView):
 class VideoSegmentView(APIView):
     permission_classes = [IsAuthenticatedWithCookie]
 
-    def get(self, **kwargs):
+    def get(self, request, *args, **kwargs):
         movie_id = kwargs.get("movie_id")
         segment = kwargs.get("segment")
 
