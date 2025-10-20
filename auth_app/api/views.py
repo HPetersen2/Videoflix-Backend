@@ -35,7 +35,7 @@ class RegistrationView(APIView):
 
             activation_link = f'http://127.0.0.1:5500/pages/auth/activate.html?uid={uid}&token={token}'
 
-            django_rq.get_queue('default').enqueue('auth_app.api.utils.send_activate_email', saved_account, activation_link)
+            django_rq.get_queue('default').enqueue('auth_app.utils.send_activate_email', saved_account, activation_link)
 
             data = {
                 "user": {
@@ -184,7 +184,7 @@ class PasswordResetView(APIView):
                 verification_link = f'http://127.0.0.1:5500/pages/auth/confirm_password.html?uid={uid}&token={token}'
 
                 django_rq.get_queue('default').enqueue(
-                    'auth_app.api.utils.send_reset_password_email',
+                    'auth_app.utils.send_reset_password_email',
                     user.id,
                     verification_link
                 )
