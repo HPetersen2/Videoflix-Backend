@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 from django.urls import reverse
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
@@ -22,9 +22,11 @@ def test_registration_view_enqueues_activation_email(mock_get_queue):
     response = client.post(url, data)
 
     assert response.status_code == 201
-    mock_queue.enqueue.assert_called_once_with('auth_app.utils.send_activate_email', 
-                                               pytest.anything(), 
-                                               pytest.anything())
+    mock_queue.enqueue.assert_called_once_with(
+        'auth_app.utils.send_activate_email', 
+        ANY,
+        ANY
+    )
 
 @pytest.mark.django_db
 @patch('auth_app.views.django_rq.get_queue')
@@ -43,6 +45,8 @@ def test_password_reset_enqueues_reset_email(mock_get_queue):
 
     response = client.post(url, data)
     assert response.status_code == 200
-    mock_queue.enqueue.assert_called_once_with('auth_app.utils.send_reset_password_email', 
-                                               user.id, 
-                                               pytest.anything())
+    mock_queue.enqueue.assert_called_once_with(
+        'auth_app.utils.send_reset_password_email', 
+        user.id, 
+        ANY
+    )
