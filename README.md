@@ -158,7 +158,7 @@ The backend will be available at:
 |--------|--------------------------------------------------------------------------|-------------------------------------|
 | GET    | `/api/video/`                                                            | Get list of videos                  |
 | GET    | `/api/video/<int:movie_id>/<str:resolution>/index.m3u8`                 | Get streaming playlist (HLS)       |
-| GET    | `/api/video/<int:movie_id>/<str:resolution>/<str:segment>/`            | Fetch video segment                 |
+| GET    | `/api/video/<int:movie_id>/<str:resolution>/<str:segment>`            | Fetch video segment                 |
 
 ---
 
