@@ -7,6 +7,7 @@ CATEGORY_CHOICES = {
 }
 
 class Video(models.Model):
+    """Represents a video with metadata, file, and thumbnail."""
     created_at = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=155)
     description = models.CharField(max_length=255)

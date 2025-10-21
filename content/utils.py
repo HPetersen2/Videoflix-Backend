@@ -5,6 +5,7 @@ from django.http import FileResponse
 from .models import Video
 
 def convert_video(source, resolution):
+    """Converts a video to the specified resolution and creates HLS segments."""
     file_directory = os.path.dirname(source)
     file_name = os.path.splitext(os.path.basename(source))[0]
     new_file_name = f"{file_name}_{resolution}p.mp4"
@@ -22,7 +23,9 @@ def convert_video(source, resolution):
     hls_file_cmd = f"ffmpeg -i '{new_file_path}' -codec copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls '{hls_file_path}'"
     subprocess.run(hls_file_cmd, capture_output=True, shell=True)
 
+
 def get_video_file(movie_id, **kwargs):
+    """Retrieves the requested video or HLS segment file for streaming."""
     resolution = kwargs.get("resolution")
     segment = kwargs.get("segment")
 

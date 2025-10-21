@@ -6,11 +6,14 @@ from .permissions import IsAuthenticatedWithCookie
 from .serializers import VideoListSerializer
 
 class VideoListView(generics.ListAPIView):
+    """Returns a list of all videos with authentication via cookie."""
     permission_classes = [IsAuthenticatedWithCookie]
     queryset = Video.objects.all()
     serializer_class = VideoListSerializer
 
+
 class VideoView(APIView):
+    """Streams a specific video file by ID and resolution."""
     permission_classes = [IsAuthenticatedWithCookie]
 
     def get(self, request, *args, **kwargs):
@@ -18,8 +21,10 @@ class VideoView(APIView):
         resolution = kwargs.get("resolution")
 
         return get_video_file(movie_id, resolution=resolution)
-    
+
+
 class VideoSegmentView(APIView):
+    """Streams a specific video segment by ID and segment number."""
     permission_classes = [IsAuthenticatedWithCookie]
 
     def get(self, request, *args, **kwargs):

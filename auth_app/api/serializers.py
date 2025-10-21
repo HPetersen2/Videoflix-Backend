@@ -6,6 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    """Handles user registration with email uniqueness and password confirmation."""
     confirmed_password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -40,6 +41,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return account
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Authenticates user using email and password instead of username."""
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
@@ -68,6 +70,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
     
 class PasswordResetSerializer(serializers.ModelSerializer):
+    """Validates email for initiating password reset process."""
     class Meta:
         model = User
         fields = ['email']
@@ -78,6 +81,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         return None
     
 class SetNewPasswordSerializer(serializers.Serializer):
+    """Validates and confirms new password during password reset."""
     new_password = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
 

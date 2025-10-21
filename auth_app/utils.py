@@ -2,6 +2,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
 def send_activate_email(saved_account, activation_link):
+    """Sends an account activation email with a confirmation link."""
     subject = 'Confirm your email'
     from_email = None
     context = {
@@ -18,7 +19,9 @@ def send_activate_email(saved_account, activation_link):
     email.attach_alternative(html_content, "text/html")
     email.send(fail_silently=False)
 
+
 def send_reset_password_email(saved_account, verification_link):
+    """Sends a password reset email with a verification link."""
     subject = 'Reset your password'
     from_email = None
     context = {

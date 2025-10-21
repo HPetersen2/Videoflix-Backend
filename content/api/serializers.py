@@ -2,6 +2,7 @@ from rest_framework import serializers
 from content.models import Video
 
 class VideoListSerializer(serializers.ModelSerializer):
+    """Serializes video data with absolute thumbnail URL."""
     thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:

@@ -19,6 +19,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+"""
+Main URL configurations:
+- /admin/ : Django admin interface.
+- /django-rq/ : Django RQ dashboard for task queue monitoring.
+- /api/ : Includes core app API routes.
+- Static media serving enabled during DEBUG mode.
+"""
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
@@ -27,3 +35,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

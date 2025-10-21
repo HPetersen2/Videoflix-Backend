@@ -18,6 +18,7 @@ from .serializers import RegistrationSerializer, CustomTokenObtainPairSerializer
 User = get_user_model()
 
 class RegistrationView(APIView):
+    """Registers a new user and sends an activation email."""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -29,7 +30,6 @@ class RegistrationView(APIView):
 
             uid = urlsafe_base64_encode(force_bytes(saved_account.pk))
             token = default_token_generator.make_token(saved_account)
-
 
             activation_path = reverse('auth_app:activate', kwargs={'uidb64': uid, 'token': token})
 
@@ -50,6 +50,7 @@ class RegistrationView(APIView):
 
 
 class ActivationView(APIView):
+    """Activates a user account via token from the activation email."""
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
@@ -68,6 +69,7 @@ class ActivationView(APIView):
 
 
 class LoginView(TokenObtainPairView):
+    """Logs in a user and returns tokens as cookies."""
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
@@ -108,7 +110,9 @@ class LoginView(TokenObtainPairView):
 
         return response
 
+
 class LogoutView(APIView):
+    """Logs out the user and blacklists the refresh token."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -129,8 +133,11 @@ class LogoutView(APIView):
         response.delete_cookie("refresh_token")
 
         return response
-    
+
+
 class TokenRefreshView(TokenRefreshView):
+    """Refreshes JWT access token using the refresh token stored in cookies."""
+
     def post(self, request, *args, **kwargs):
         """Refresh the access token using the refresh token stored in cookies."""
         refresh_token = request.COOKIES.get("refresh_token")
@@ -140,8 +147,8 @@ class TokenRefreshView(TokenRefreshView):
                 {"detail": "Refresh token not found!"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        serializer = self.get_serializer(data={"refresh":refresh_token})
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
 
         try:
             serializer.is_valid(raise_exception=True)
@@ -150,7 +157,7 @@ class TokenRefreshView(TokenRefreshView):
                 {"detail": "Refresh token invalid!"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        
+
         access_token = serializer.validated_data.get("access")
 
         response = Response({"detail": "Token refreshed", "access": "new_access_token"})
@@ -163,8 +170,10 @@ class TokenRefreshView(TokenRefreshView):
         )
 
         return response
-    
+
+
 class PasswordResetView(APIView):
+    """Sends a password reset link to the user's email if account exists."""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -190,10 +199,12 @@ class PasswordResetView(APIView):
                 )
         except User.DoesNotExist:
             pass
-        
+
         return Response({"detail": "If an account with this email exists, a password reset link has been sent."}, status=status.HTTP_200_OK)
-    
+
+
 class SetNewPasswordView(APIView):
+    """Resets the user's password using a valid token and uid."""
     permission_classes = [AllowAny]
 
     def post(self, request, uidb64, token):

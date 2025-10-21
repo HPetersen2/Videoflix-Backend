@@ -3,6 +3,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 class IsAuthenticatedWithCookie(BasePermission):
+    """Custom permission to authenticate user via JWT in cookies."""
+
     def has_permission(self, request, view):
         jwt_authenticator = JWTAuthentication()
 
@@ -14,7 +16,7 @@ class IsAuthenticatedWithCookie(BasePermission):
         
             return user is not None and user.is_authenticated
         
-        except(InvalidToken, TokenError):
+        except (InvalidToken, TokenError):
             return False
         except Exception:
             return False
