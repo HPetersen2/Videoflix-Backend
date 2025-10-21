@@ -30,7 +30,6 @@ The Videoflix backend provides the following core features:
 - **Docker** and **Docker Compose**  
   → [Install Docker](https://docs.docker.com/get-docker/)  
 - **ffmpeg** (required for video transcoding)
-  → [Install ffmpeg](https://ffmpeg.org/) 
 
 ### Installing `ffmpeg`
 
