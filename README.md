@@ -136,6 +136,39 @@ The backend will be available at:
 
 ---
 
+### 6. Running Tests with Pytest and Coverage
+
+This project uses `pytest` for testing and `coverage.py` to measure test coverage. All tests are run inside the Docker container.
+
+#### Running Tests
+
+To run the tests using `pytest`, execute the following command:
+
+```bash
+docker-compose run --rm web pytest
+```
+
+#### Checking Test Coverage
+
+To run the tests with coverage measurement and print a summary in the terminal:
+
+```bash
+docker-compose run --rm web coverage run -m pytest
+docker-compose run --rm web coverage report
+```
+
+#### Generating an HTML Coverage Report
+
+To generate a visual HTML coverage report:
+
+```bash
+docker-compose run --rm web coverage html
+```
+
+The generated report will be available in the `htmlcov/` directory. You can open it in a browser by navigating to `htmlcov/index.html`.
+
+> Note: Replace `web` with the name of your service in `docker-compose.yml` if it's different.
+
 ## API Endpoints
 
 ### Authentication
