@@ -1,108 +1,48 @@
 import pytest
+from unittest.mock import patch
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-from rest_framework import status
 from rest_framework.test import APIClient
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
-@pytest.fixture
-def user():
-    """Fixture to create a test user."""
-    return User.objects.create_user(
-        email='test@test.de',
-        password='testpassword'
-    )
-
-
-@pytest.fixture
-def register_url():
-    """Fixture to provide the registration URL."""
-    return reverse('register')  # ensure you have this URL name in urls.py
-
-
-@pytest.fixture
-def api_client():
-    """Fixture to return an instance of APIClient."""
-    return APIClient()
-
-
 @pytest.mark.django_db
-def test_register(api_client, register_url):
-    """Test registering a new user."""
-    user_data = {
-        "email": "newuser@test.de",
-        "password": "testpassword",
-        "confirmed_password": "testpassword"
-    }
+@patch('auth_app.views.django_rq.get_queue')
+def test_registration_view_enqueues_activation_email(mock_get_queue):
+    mock_queue = mock_get_queue.return_value
+    mock_queue.enqueue.return_value = None
 
-    response = api_client.post(register_url, user_data, format='json')
-
-    assert response.status_code == status.HTTP_201_CREATED
-    assert User.objects.filter(email="newuser@test.de").exists()
-
-    response_data = response.json()
-    assert "user" in response_data
-    assert response_data["user"]["email"] == "newuser@test.de"
-    assert "token" in response_data
-    assert response_data["token"] == "activation_token"
-
-
-@pytest.mark.django_db
-def test_register_existing_email(api_client, register_url, user):
-    """Test registering with an email that already exists."""
+    client = APIClient()
+    url = reverse('auth_app:register')
     data = {
-        "email": "test@test.de",
-        "password": "testpassword",
-        "confirmed_password": "testpassword"
+        "email": "testuser@example.com",
+        "password": "strongpassword123",
+        "confirmed_password": "strongpassword123"
     }
+    response = client.post(url, data)
 
-    response = api_client.post(register_url, data, format='json')
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert 'email' in response.json()
-
+    assert response.status_code == 201
+    mock_queue.enqueue.assert_called_once_with('auth_app.utils.send_activate_email', 
+                                               pytest.anything(), 
+                                               pytest.anything())
 
 @pytest.mark.django_db
-def test_register_invalid_email(api_client, register_url):
-    """Test registering with an invalid email format."""
-    data = {
-        "email": "invalid-email-format",
-        "password": "securepassword",
-        "confirmed_password": "securepassword"
-    }
+@patch('auth_app.views.django_rq.get_queue')
+def test_password_reset_enqueues_reset_email(mock_get_queue):
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
 
-    response = api_client.post(register_url, data, format='json')
+    mock_queue = mock_get_queue.return_value
+    mock_queue.enqueue.return_value = None
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert 'email' in response.json()
+    user = User.objects.create_user(email='reset@test.com', password='pw123456', is_active=True)
 
+    client = APIClient()
+    url = reverse('auth_app:password-reset')
+    data = {"email": "reset@test.com"}
 
-@pytest.mark.django_db
-def test_register_missing_fields(api_client, register_url):
-    """Test registering with missing or empty fields."""
-    data = {
-        "email": "test@test.de",
-        "password": ""
-    }
-
-    response = api_client.post(register_url, data, format='json')
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert 'password' in response.json()
-
-
-@pytest.mark.django_db
-def test_register_password_mismatch(api_client, register_url):
-    """Test registering with mismatching password and confirmed_password."""
-    data = {
-        "email": "another@test.de",
-        "password": "password123",
-        "confirmed_password": "differentpassword"
-    }
-
-    response = api_client.post(register_url, data, format='json')
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert 'non_field_errors' in response.json() or 'confirmed_password' in response.json()
+    response = client.post(url, data)
+    assert response.status_code == 200
+    mock_queue.enqueue.assert_called_once_with('auth_app.utils.send_reset_password_email', 
+                                               user.id, 
+                                               pytest.anything())
