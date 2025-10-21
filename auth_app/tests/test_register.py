@@ -13,6 +13,7 @@ class TestRegistrationView:
     url = reverse('auth_app:register')
 
     def test_register_success(self):
+        """Tests successful user registration with matching passwords."""
         client = APIClient()
         data = {
             "email": "test@example.com",
@@ -24,6 +25,7 @@ class TestRegistrationView:
         assert "user" in response.data
 
     def test_register_password_mismatch(self):
+        """Tests registration failure when passwords do not match."""
         client = APIClient()
         data = {
             "email": "test2@example.com",
@@ -37,7 +39,9 @@ class TestRegistrationView:
 
 @pytest.mark.django_db
 class TestActivationView:
+
     def test_activation_success(self):
+        """Tests successful account activation using a valid token."""
         user = User.objects.create(email="activate@example.com", is_active=False)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
@@ -50,6 +54,7 @@ class TestActivationView:
         assert user.is_active
 
     def test_activation_invalid_token(self):
+        """Tests activation failure due to an invalid token."""
         user = User.objects.create(email="invalid@example.com", is_active=False)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         url = reverse('auth_app:activate', kwargs={'uidb64': uid, 'token': 'wrongtoken'})
@@ -59,3 +64,4 @@ class TestActivationView:
         user.refresh_from_db()
         assert response.status_code == 400
         assert not user.is_active
+

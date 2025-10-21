@@ -10,6 +10,7 @@ class TestLoginView:
     url = reverse('auth_app:login')
 
     def test_login_success(self):
+        """Tests successful login and presence of access token in cookies."""
         password = "secret123"
         user = User.objects.create(email="login@example.com", username="login@example.com")
         user.set_password(password)
@@ -23,6 +24,7 @@ class TestLoginView:
         assert response.cookies.get("access_token") is not None
 
     def test_login_invalid_credentials(self):
+        """Tests login failure with invalid email/password combination."""
         client = APIClient()
         response = client.post(self.url, {"email": "nope@example.com", "password": "wrong"})
         assert response.status_code == 400 or response.status_code == 401

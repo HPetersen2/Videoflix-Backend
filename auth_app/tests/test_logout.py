@@ -10,6 +10,7 @@ class TestLogoutView:
     url = reverse('auth_app:logout')
 
     def test_logout_blacklist_token(self, django_user_model):
+        """Tests that a refresh token is blacklisted on logout when user is authenticated."""
         user = django_user_model.objects.create_user(email="logout@example.com", password="pw1234")
         client = APIClient()
         client.force_authenticate(user=user)
