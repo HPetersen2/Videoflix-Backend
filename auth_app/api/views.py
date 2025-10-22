@@ -194,7 +194,7 @@ class PasswordResetView(APIView):
 
                 django_rq.get_queue('default').enqueue(
                     'auth_app.utils.send_reset_password_email',
-                    user.id,
+                    user,
                     verification_link
                 )
         except User.DoesNotExist:
