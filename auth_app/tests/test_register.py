@@ -1,10 +1,10 @@
 import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
-from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -13,7 +13,7 @@ class TestRegistrationView:
     url = reverse('auth_app:register')
 
     def test_register_success(self):
-        """Tests successful user registration with matching passwords."""
+        """Post valid registration data, expect 201 and user in response."""
         client = APIClient()
         data = {
             "email": "test@example.com",
@@ -25,7 +25,7 @@ class TestRegistrationView:
         assert "user" in response.data
 
     def test_register_password_mismatch(self):
-        """Tests registration failure when passwords do not match."""
+        """Post mismatched passwords, expect 400 and error for confirmed_password."""
         client = APIClient()
         data = {
             "email": "test2@example.com",
@@ -41,8 +41,8 @@ class TestRegistrationView:
 class TestActivationView:
 
     def test_activation_success(self):
-        """Tests successful account activation using a valid token."""
-        user = User.objects.create(email="activate@example.com", is_active=False)
+        """Activate user with valid uid and token, expect 200 and user active."""
+        user = User.objects.create_user(username="activateuser", email="activate@example.com", password="pass1234", is_active=False)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
         url = reverse('auth_app:activate', kwargs={'uidb64': uid, 'token': token})
@@ -54,8 +54,8 @@ class TestActivationView:
         assert user.is_active
 
     def test_activation_invalid_token(self):
-        """Tests activation failure due to an invalid token."""
-        user = User.objects.create(email="invalid@example.com", is_active=False)
+        """Activate user with invalid token, expect 400 and user still inactive."""
+        user = User.objects.create_user(username="activateuser", email="invalid@example.com", password="pass1234", is_active=False)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         url = reverse('auth_app:activate', kwargs={'uidb64': uid, 'token': 'wrongtoken'})
 

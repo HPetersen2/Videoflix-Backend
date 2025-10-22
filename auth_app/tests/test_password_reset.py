@@ -14,7 +14,7 @@ class TestPasswordResetView:
 
     def test_password_reset_email_sent(self):
         """Tests that a password reset email is sent for an existing user."""
-        user = User.objects.create(email="reset@example.com", is_active=True)
+        user = User.objects.create_user(email="reset@example.com", username="resetuser", password="pw1234", is_active=True)
         client = APIClient()
         response = client.post(self.url, {"email": user.email})
         assert response.status_code == 200
