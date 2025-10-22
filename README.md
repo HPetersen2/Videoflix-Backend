@@ -99,17 +99,17 @@ Copy the template `.env` file:
 
 - **Linux/macOS**:
   ```bash
-  cp env.template .env
+  cp .env.template .env
   ```
 
 - **Windows (CMD)**:
   ```cmd
-  copy env.template .env
+  copy .env.template .env
   ```
 
 - **Windows (PowerShell)**:
   ```powershell
-  Copy-Item env.template .env
+  Copy-Item .env.template .env
   ```
 
 Edit the `.env` file and set the necessary variables.
