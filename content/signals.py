@@ -8,9 +8,7 @@ from .models import Video
 @receiver(post_save, sender=Video)
 def video_post_save(sender, instance, created, **kwargs):
     """Triggers video conversion tasks after a new video is saved."""
-    print('Video saved')
     if created:
-        print("converting...")
         django_rq.enqueue(convert_video, instance.video_file.path, "hd1080")
         django_rq.enqueue(convert_video, instance.video_file.path, "hd720")
         django_rq.enqueue(convert_video, instance.video_file.path, "hd480")
