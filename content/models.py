@@ -8,6 +8,12 @@ def validate_thumbnail_format(image):
     if image.file.content_type not in valid_mime_types:
         raise ValidationError('Nur PNG- und JPEG-Bilder sind erlaubt.')
     
+def validate_file_size(value):
+    """Custom validator to allow videofiles smaller than 1000 MB"""
+    max_size = 1000 * 1024 * 1024
+    if value.size > max_size:
+        raise ValidationError(f"Die Datei ist zu groß. Maximal zulässige Größe: {max_size / (1024 * 1024)} MB")
+    
 def validate_video_format(video):
     """Custom validator to allow only common video formats."""
     valid_mime_types = [
@@ -43,7 +49,7 @@ class Video(models.Model):
         blank=False,
         validators=[
             FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi', 'mkv', 'webm']),
-            validate_video_format,
+            validate_video_format, validate_file_size
         ],
     )
 
