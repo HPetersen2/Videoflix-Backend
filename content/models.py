@@ -1,11 +1,18 @@
 from django.db import models
+import mimetypes
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
 def validate_thumbnail_format(image):
     """Custom validator to allow only PNG and JPEG files."""
     valid_mime_types = ['image/jpeg', 'image/png']
-    if image.file.content_type not in valid_mime_types:
+    
+    content_type = getattr(image.file, 'content_type', None)
+    
+    if content_type is None:
+        content_type, _ = mimetypes.guess_type(image.file.name)
+
+    if content_type not in valid_mime_types:
         raise ValidationError('Nur PNG- und JPEG-Bilder sind erlaubt.')
     
 def validate_video_format(video):
